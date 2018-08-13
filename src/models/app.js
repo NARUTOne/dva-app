@@ -1,7 +1,8 @@
-import { query, logout } from '../services/app'
-import { routerRedux } from 'dva/router'
-import { config, auth } from 'utils'
-import { parse } from 'qs'
+
+import { routerRedux } from 'dva/router';
+import { config, auth } from 'utils';
+import { parse } from 'qs';
+// import { query, logout } from '../services/app';
 
 export default {
   namespace: 'app',
@@ -9,7 +10,7 @@ export default {
     user: {},
     isCollapsed: false,
     menu: [
-      { 
+      {
         id: 1,
         icon: 'laptop',
         name: 'Dashboard',
@@ -26,114 +27,112 @@ export default {
             icon: 'bars',
             name: 'list',
             router: '/todo/list',
-          }
-        ]
-      }
+          },
+        ],
+      },
     ],
-    isNavbar: document.body.clientWidth < 769,
+    isNavbar: window.document.body.clientWidth < 769,
   },
   subscriptions: {
-    setup ({ dispatch, history }) {
-      //登录验证
+    setup({ dispatch, history }) {
+      // 登录验证
       // dispatch({ type: 'query' })
 
-      history.listen(location => {
-        if ((config.homePages.indexOf(location.pathname) < 0 && config.openPages.indexOf(location.pathname) < 0) && !auth.isLoginIn() ) {
-          dispatch({ type: 'init' })
+      history.listen((location) => {
+        if ((config.homePages.indexOf(location.pathname) < 0 &&
+          config.openPages.indexOf(location.pathname) < 0) && !auth.isLoginIn()) {
+          dispatch({ type: 'init' });
         }
-      })
-      
+      });
+
       // 移动 端导航
-      let tid
+      let tid;
       window.onresize = () => {
-        clearTimeout(tid)
+        clearTimeout(tid);
         tid = setTimeout(() => {
-          dispatch({ type: 'changeNavbar' })
-        }, 300)
-      }
+          dispatch({ type: 'changeNavbar' });
+        }, 300);
+      };
     },
   },
   effects: {
     *init({
-      payload
-    },{call, put}) {
-      yield put(routerRedux.push('/home'))
-    },
-    *query ({ 
       payload,
     }, { call, put }) {
-      
+      yield put(routerRedux.push('/home'));
+    },
+    *query({
+      payload,
+    }, { call, put }) {
       // const { success, user } = yield call(query, payload)
-      let user = null
-      if(auth.isLoginIn()) {
-        user = parse(auth.user)
+      let user = null;
+      if (auth.isLoginIn()) {
+        user = parse(auth.user);
       }
 
-      const success = true 
-           
+      const success = true;
+
       if (success && user) {
-        
         yield put({
           type: 'updateState',
           payload: {
-            user 
+            user,
           },
-        })
-          
-        auth.register(user)
+        });
+
+        auth.register(user);
 
         if (location.pathname === '/login') {
-          yield put(routerRedux.push('/home'))
+          yield put(routerRedux.push('/home'));
         }
-      } else {
-        if (config.homePages.indexOf(location.pathname) < 0 && config.openPages.indexOf(location.pathname) < 0) {
-          let from = location.pathname
-          window.location = `${location.origin}/login?from=${from}`
-        }
+      } else if (config.homePages.indexOf(location.pathname) < 0 &&
+       config.openPages.indexOf(location.pathname) < 0) {
+        const from = location.pathname;
+        window.location = `${location.origin}/login?from=${from}`;
       }
-    }, 
+    },
 
-    *logout ({
+    *logout({
       payload,
     }, { call, put }) {
-      auth.destroy()
-      yield put({ type: 'query' })
+      auth.destroy();
+      yield put({ type: 'query' });
     },
-    *login ({
+    *login({
       payload,
     }, { call, put }) {
-      let from = location.pathname
-      window.location = `${location.origin}/login?from=${from}`
+      const from = location.pathname;
+      window.location = `${location.origin}/login?from=${from}`;
     },
-     *changeNavbar ({
+    *changeNavbar({
       payload,
     }, { put, select }) {
-      const { app } = yield(select(_ => _))
-      const isNavbar = document.body.clientWidth < 769
+      const { app } = yield (select(_ => _));
+      const isNavbar = document.body.clientWidth < 769;
       if (isNavbar !== app.isNavbar) {
-        yield put({ type: 'handleNavbar', payload: isNavbar })
+        yield put({ type: 'handleNavbar', payload: isNavbar });
       }
     },
-    
+
   },
   reducers: {
-    updateState (state, { payload }) {
+    updateState(state, { payload }) {
       return {
         ...state,
         ...payload,
-      }
+      };
     },
-    toggle (state, { payload }) {
+    toggle(state, { payload }) {
       return {
         ...state,
         isCollapsed: payload.isCollapsed,
-      }
+      };
     },
-    handleNavbar (state, { payload }) {
+    handleNavbar(state, { payload }) {
       return {
         ...state,
         isNavbar: payload,
-      }
+      };
     },
-  }
-}
+  },
+};

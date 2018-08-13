@@ -1,118 +1,118 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'dva'
-import NProgress from 'nprogress'
-import classnames from 'classnames'
-import { config } from 'utils'
-import { Layoutx, Loader } from 'components'
-import { Layout, Menu, Icon, Popover } from 'antd'
-import './app.less'
-import '../themes/index.less'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'dva';
+import NProgress from 'nprogress';
+import classnames from 'classnames';
+import { config } from 'utils';
+import { Layoutx, Loader } from 'components';
+import { Layout, Menu, Icon, Popover } from 'antd';
+import './app.less';
+import '../themes/index.less';
 
-const { prefix, homePages, openPages } = config
-const { Header, Footer, Menux, Bread, styles } = Layoutx
+const { prefix, homePages, openPages } = config;
+const { Header, Footer, Menux, Bread, styles } = Layoutx;
 
-const {Sider, Content } = Layout;
+const { Sider, Content } = Layout;
 
-let lastHref
+let lastHref;
 
 const App = ({ children, dispatch, app, loading, location }) => {
-	const {user, isCollapsed, menu, isNavbar} = app
-  let { pathname } = location
-  pathname = pathname.startsWith('/') ? pathname : `/${pathname}`
-  const href = window.location.href
-  
-	const headerProps = {
-    user,
-    logout () {
-      dispatch({ type: 'app/logout' })
-    },
-    login () {
-      dispatch({ type: 'app/login' })
-    }
-  }
-	
-	const toggle = () => {
-    dispatch({ type: 'app/toggle', payload: { isCollapsed: !isCollapsed } })
-  }
-	
-	const menuProps = {
-		menu
-	}
+  const { user, isCollapsed, menu, isNavbar } = app;
+  let { pathname } = location;
+  pathname = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  const href = window.location.href;
 
-  //web app
+  const headerProps = {
+    user,
+    logout() {
+      dispatch({ type: 'app/logout' });
+    },
+    login() {
+      dispatch({ type: 'app/login' });
+    },
+  };
+
+  const toggle = () => {
+    dispatch({ type: 'app/toggle', payload: { isCollapsed: !isCollapsed } });
+  };
+
+  const menuProps = {
+    menu,
+  };
+
+  // web app
   const menuProps1 = {
     menu,
-    handleClickNavMenu: toggle
-  }
-	
-	const breadProps = {
-		menu
-	}	
-  
+    handleClickNavMenu: toggle,
+  };
+
+  const breadProps = {
+    menu,
+  };
+
   if (lastHref !== href) {
-    NProgress.start()
+    NProgress.start();
     if (!loading.global) {
-      NProgress.done()
-      lastHref = href
+      NProgress.done();
+      lastHref = href;
     }
   }
-  
+
   if (openPages && openPages.includes(pathname)) {
     return (<div>
       <Loader spinning={loading.effects['app/query']} />
       {children}
-    </div>)
+    </div>);
   }
   if (homePages && homePages.includes(pathname)) {
     return (<div>
       <div className={styles.homeBox}>
-      	<Header {...headerProps} />
-      	{children}
-      	<Footer />
+        <Header {...headerProps} />
+        {children}
+        <Footer />
       </div>
-    </div>)
+    </div>);
   }
-  
+
   return (
     <Layout>
       {!isNavbar ? <Sider
-				breakpoint='md'
-				collapsedWidth="0"
-				trigger={null}
+        breakpoint="md"
+        collapsedWidth="0"
+        trigger={null}
         collapsible
         collapsed={isCollapsed}
       >
-        <Menux {...menuProps}/>
+        <Menux {...menuProps} />
       </Sider> : null}
       <Layout>
         <Header {...headerProps} />
         <div>
-        	{isNavbar ? <Popover placement="bottomLeft" onVisibleChange={toggle} visible={isCollapsed} overlayClassName={styles.popovermenu} trigger="click" content={<Menux {...menuProps1} />}>
-	          <div className={styles.slider_btn} onClick={toggle}>
-		          <Icon
-		            className="trigger"
-		            type={isCollapsed ? 'menu-unfold' : 'menu-fold'}
+          {isNavbar ? <Popover placement="bottomLeft" onVisibleChange={toggle} visible={isCollapsed} overlayClassName={styles.popovermenu} trigger="click" content={<Menux {...menuProps1} />}>
+            <div className={styles.slider_btn} onClick={toggle}>
+              <Icon
+                className="trigger"
+                type={isCollapsed ? 'menu-unfold' : 'menu-fold'}
 		          />
-		        </div>
-	        </Popover> :
-	        	<div className={styles.slider_btn} onClick={toggle}>
-		          <Icon
-		            className="trigger"
-		            type={isCollapsed ? 'menu-unfold' : 'menu-fold'}
+            </div>
+          </Popover> :
+          <div className={styles.slider_btn} onClick={toggle}>
+            <Icon
+              className="trigger"
+              type={isCollapsed ? 'menu-unfold' : 'menu-fold'}
 		          />
-		        </div>}
-	        <Bread {...breadProps}/>
+          </div>}
+          <Bread {...breadProps} />
         </div>
-        
+
         <Content style={{ margin: '24px 16px', padding: '16px', background: '#fff', minHeight: 280 }}>
           <div className={styles.app_content}>{children}</div>
         </Content>
         <Footer />
       </Layout>
     </Layout>
-  )
-}
+  );
+};
 
 App.propTypes = {
   children: PropTypes.element.isRequired,
@@ -120,6 +120,6 @@ App.propTypes = {
   dispatch: PropTypes.func,
   app: PropTypes.object,
   loading: PropTypes.object,
-}
+};
 
-export default connect(({ app, loading }) => ({ app, loading }))(App)
+export default connect(({ app, loading }) => ({ app, loading }))(App);

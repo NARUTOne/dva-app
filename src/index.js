@@ -1,8 +1,8 @@
 import dva from 'dva';
-import createLoading from 'dva-loading'
-import { browserHistory } from 'dva/router'
-import { message } from 'antd'
-import './index.css'
+import createLoading from 'dva-loading';
+import { browserHistory } from 'dva/router';
+import { message } from 'antd';
+import './index.css';
 
 // 1. Initialize
 const app = dva({
@@ -10,8 +10,8 @@ const app = dva({
     effects: true,
   }),
   history: browserHistory,
-  onError (error) {
-    message.error(error.message)
+  onError(error) {
+    message.error(error.message);
   },
 });
 
@@ -19,7 +19,7 @@ const app = dva({
 // app.use({});
 
 // 3. Model
-app.model(require('./models/app'))
+app.model(require('./models/app'));
 
 // 4. Router
 app.router(require('./router'));
